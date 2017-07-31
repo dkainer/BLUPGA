@@ -4,7 +4,7 @@
 \alias{blupga_GBLUP}
 \title{Standard GBLUP}
 \usage{
-blupga_GBLUP(G, phenodata, valset)
+blupga_GBLUP(G, phenodata, valset, verbose = T)
 }
 \arguments{
 \item{G}{G-matrix constructed using all available SNPs and samples Defaults to NULL.}

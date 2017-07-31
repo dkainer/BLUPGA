@@ -4,7 +4,8 @@
 \alias{blupga_CAND}
 \title{BLUP|GA using SNPs in Candidate Genes}
 \usage{
-blupga_CAND(G = NULL, phenodata = NULL, valset = NULL, GRMs = NULL)
+blupga_CAND(G = NULL, phenodata = NULL, valset = NULL, GRMs = NULL,
+  verbose = T)
 }
 \arguments{
 \item{G}{G-matrix constructed using all available SNPs and samples Defaults to NULL.}

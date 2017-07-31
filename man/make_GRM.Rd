@@ -10,7 +10,7 @@ make_GRM(genomat)
 \item{genomat}{matrix of genotypes in -1,0,1 format (i.e. 0 is heterozygous, 1 and -1 are opposing homozygous states)}
 }
 \description{
-This function runs the BLUP|GA method where SNPs with the greatest squared effect size are weighted in the GRM prior to GBLUP
+This function ....
 }
 \examples{
 make_GRM()
