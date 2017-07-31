@@ -122,10 +122,14 @@ blupga_para_CAND <- function(G=NULL, phenodata=NULL, valset=NULL, GRMs=NULL, ver
 #' BLUP|GA using top SNPS according to estimated SNP effect
 #'
 #' This function runs the BLUP|GA method where SNPs with the greatest squared effect size are weighted in the GRM prior to GBLUP
-#' @param valset vector of indices Defaults to NULL.
 #' @param G G-matrix constructed using all available SNPs and samples Defaults to NULL.
 #' @param phenodata data frame with 2 columns: ID and y Defaults to NULL.
+#' @param valset vector of indices that defines which rows in phenodata will be set to NA and used for cross-validation Defaults to NULL.
+#' @param genomat matrix of genotypes in -1,0,1 format (i.e. 0 is heterozygous, 1 and -1 are opposing homozygous states)
+#' @param bsq vector of squared marker effects the same length as the number of SNPs in genomat. Can be obtained with est_SNPeffects()
 #' @param perc proportion of SNPs to be weighted (between 0 and 1), where 0.05 means the top 5% of SNPs will be weighted. Defaults to NULL.
+#' @param flank choose to include the immediate SNPs to the left and right of a top 'perc' SNP. Defaults to TRUE
+#' @param verbose just leave this for now!
 #' @keywords GBLUP,BLUP|GA,SNP selection
 #' @export
 #' @examples
