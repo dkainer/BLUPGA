@@ -7,14 +7,14 @@
 blupga_GBLUP(G, phenodata, valset, verbose = T)
 }
 \arguments{
-\item{G}{G-matrix constructed using all available SNPs and samples Defaults to NULL.}
+\item{G}{GRM constructed using all available SNPs and all samples Defaults to NULL. Use \code{make_GRM()} to get this.}
 
-\item{phenodata}{data frame with 2 columns: ID and y Defaults to NULL.}
+\item{phenodata}{data frame with 2 columns. One col must be named 'ID' and contain sample IDs. Another column must be named 'y' and contain the phenotypes. Defaults to NULL.}
 
-\item{valset}{vector of indices Defaults to NULL.}
+\item{valset}{vector of indices that defines which rows in \code{phenodata} will be set to NA and used for cross-validation Defaults to NULL.}
 }
 \description{
-This function runs the BLUP|GA method where SNPs in candidate genes are weighted in the GRM prior to GBLUP
+This function runs straightforward GBLUP using the rrBLUP package. This is the equivalent of BLUP|GA where W=0 (i.e. no SNPs are weighted)
 }
 \examples{
 blupga_GBLUP()

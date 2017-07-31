@@ -10,11 +10,14 @@ blupga_CAND(G = NULL, phenodata = NULL, valset = NULL, GRMs = NULL,
 \arguments{
 \item{G}{G-matrix constructed using all available SNPs and samples Defaults to NULL.}
 
-\item{phenodata}{data frame with 2 columns: ID and y Defaults to NULL.}
+\item{phenodata}{data frame with 2 columns. One col must be named 'ID' and contain sample IDs. Another column must be named 'y' and contain the phenotypes. Defaults to NULL.}
 
-\item{valset}{vector of indices Defaults to NULL.}
+\item{valset}{vector of indices that defines which rows in \code{phenodata} will be set to NA and used for cross-validation Defaults to NULL.}
 
-\item{GRMs}{List of G-matrices, each constructed from just the SNPs in one candidate gene/region Defaults to NULL.}
+\item{GRMs}{List of G-matrices, each constructed from just the SNPs in one candidate gene/region. Defaults to NULL.}
+}
+\value{
+a data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}. Each row contains that correlation at increasing values of the weighting value W.
 }
 \description{
 This function runs the BLUP|GA method where SNPs in candidate genes are weighted in the GRM prior to GBLUP

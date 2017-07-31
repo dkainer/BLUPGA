@@ -5,27 +5,30 @@
 \title{BLUP|GA using top SNPS according to estimated SNP effect}
 \usage{
 blupga_EFF(G, phenodata, valset = NULL, genomat, bsq, perc, flank = TRUE,
-  verbose = T)
+  verbose = TRUE)
 }
 \arguments{
 \item{G}{G-matrix constructed using all available SNPs and samples Defaults to NULL.}
 
-\item{phenodata}{data frame with 2 columns: ID and y Defaults to NULL.}
+\item{phenodata}{data frame with 2 columns. One col must be named 'ID' and contain sample IDs. Another column must be named 'y' and contain the phenotypes. Defaults to NULL.}
 
-\item{valset}{vector of indices that defines which rows in phenodata will be set to NA and used for cross-validation Defaults to NULL.}
+\item{valset}{vector of indices that defines which rows in \code{phenodata} will be set to NA and used for cross-validation Defaults to NULL.}
 
-\item{genomat}{matrix of genotypes in -1,0,1 format (i.e. 0 is heterozygous, 1 and -1 are opposing homozygous states)}
+\item{genomat}{matrix of genotypes in -1,0,1 format (i.e. 0 is heterozygous, 1 and -1 are opposing homozygous states).}
 
-\item{bsq}{vector of squared marker effects the same length as the number of SNPs in genomat. Can be obtained with est_SNPeffects()}
+\item{bsq}{vector of squared marker effects the same length as the number of SNPs in genomat. Can be obtained with \code{est_SNPeffects()}.}
 
-\item{perc}{proportion of SNPs to be weighted (between 0 and 1), where 0.05 means the top 5% of SNPs will be weighted. Defaults to NULL.}
+\item{perc}{proportion of SNPs to be weighted (between 0 and 1), where 0.05 means the top 5 percent of SNPs will be weighted. Defaults to NULL.}
 
-\item{flank}{choose to include the immediate SNPs to the left and right of a top 'perc' SNP. Defaults to TRUE}
+\item{flank}{choose to include the immediate SNPs to the left and right of a top 'perc' SNP. Defaults to TRUE.}
 
 \item{verbose}{just leave this for now!}
 }
+\value{
+a data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}. Each row contains that correlation at increasing values of the weighting value W.
+}
 \description{
-This function runs the BLUP|GA method where SNPs with the greatest squared effect size are weighted in the GRM prior to GBLUP
+This function runs the BLUP|GA method where SNPs with the greatest squared effect size are weighted in the GRM prior to GBLUP.
 }
 \examples{
 blupga_EFF()

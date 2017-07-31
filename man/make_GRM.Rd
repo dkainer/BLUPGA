@@ -9,6 +9,9 @@ make_GRM(genomat)
 \arguments{
 \item{genomat}{matrix of genotypes in -1,0,1 format (i.e. 0 is heterozygous, 1 and -1 are opposing homozygous states)}
 }
+\value{
+additive Genomic Relationship Matrix with cols and rows named according to the rownames in \code{genomat}. Uses the 'cpgen' package implementation of Van Radens GRM method
+}
 \description{
 This function ....
 }

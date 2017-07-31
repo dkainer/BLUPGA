@@ -1,14 +1,17 @@
 Package: BLUPGA
 Title: BLUP|GA genomic prediction model
 Version: 0.0.0.9000
-Authors@R: person("David", "Kainer", email = "dkainer@outlook.com", role = c("aut", "cre"))
-Description: Implements the BLUP|GA genomic prediction model, AKA GBLUP given Genetic Architecture. This model uses GBLUP but modifies the G-matrix by weighting SNPs that the user deems are more important (i.e. part of the architecture of the trait being analysed)
+Authors@R: person("David", "Kainer", email = "david.kainer@anu.edu.au", role = c("aut", "cre"))
+Description: Implements the BLUP|GA genomic prediction model, AKA "GBLUP given Genetic Architecture". 
+  This model uses GBLUP but modifies the G-matrix by weighting SNPs that the user deems are more important (i.e. part of the architecture of the trait being analysed).
+  A key problems of GBLUP is that it assumes the infinitessimal model where all SNPs are treated the same and are assumed to explain an 
+  equally small proportion of trait genetic variance. This is a biologically incorrect assumption for many traits. BLUP|GA helps resolve this.
+  \code{See Zhang Z, Ober U, Erbe M, Zhang H, Gao N, He J, Li J, Simianer H (2014), Improving the accuracy of whole genome prediction for complex traits using the results of genome wide association studies. PLoS ONE 9: e93017}
 Depends: R (>= 3.3.1)
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports:
-    dplyr,
     cpgen,
 	rrBLUP (>= 4.4)
 RoxygenNote: 6.0.1.9000

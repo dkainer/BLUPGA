@@ -7,11 +7,14 @@
 est_SNPeffects(phenodata, genomat, valset, fixmat = NULL)
 }
 \arguments{
-\item{phenodata}{data frame with 2 columns: ID and y Defaults to NULL.}
+\item{phenodata}{data frame with 2 columns. One col must be named 'ID' and contain sample IDs. Another column must be named 'y' and contain the phenotypes. Defaults to NULL.}
 
 \item{genomat}{matrix of genotypes in -1,0,1 format (i.e. 0 is heterozygous, 1 and -1 are opposing homozygous states)}
 
 \item{valset}{vector of indices Defaults to NULL.}
+}
+\value{
+a vector of squared SNP effects, one per SNP in \code{genomat}, estimated with the EMMAX GWAS method from the 'cpgen' package.
 }
 \description{
 This function runs the BLUP|GA method where SNPs with the greatest squared effect size are weighted in the GRM prior to GBLUP

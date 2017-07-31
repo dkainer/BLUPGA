@@ -9,7 +9,10 @@ make_weighted_GRM(genomat, weights)
 \arguments{
 \item{genomat}{matrix of genotypes in -1,0,1 format (i.e. 0 is heterozygous, 1 and -1 are opposing homozygous states)}
 
-\item{weights}{vector of weights for each of the SNPs in the geno matrix}
+\item{weights}{vector of weights for each of the SNPs in the \code{genomat}. Use a vector of 1s to avoid weighting.}
+}
+\value{
+a weighted Genomic Relationship Matrix with cols and rows named according to the rownames in \code{genomat}. Uses the 'cpgen' package implementation of Van Radens GRM method
 }
 \description{
 This function ...
