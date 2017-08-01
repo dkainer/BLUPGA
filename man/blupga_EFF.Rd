@@ -25,13 +25,43 @@ blupga_EFF(G, phenodata, valset = NULL, genomat, bsq, perc, flank = TRUE,
 \item{verbose}{just leave this for now!}
 }
 \value{
-a data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}. Each row contains that correlation at increasing values of the weighting value W.
+A data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}.
+
+ Since BLUP|GA is run for each value of omega (W) from 0.0 to 1.0 in increments of 0.10, each row of the returned data frame
+  contains the cross-validation correlation at one value of omega (W). This allows the user to find the value of W
+  at which the predictive ability (COR) is maximised.
+\describe{
+  \item{W}{omega weighting for selected SNPS in candidate genes (0.0--1.0)}
+  \item{COR}{cross validation predictive ability (0.0--1.0)}
+  }
 }
 \description{
 This function runs the BLUP|GA method where SNPs with the greatest squared effect size are weighted in the GRM prior to GBLUP.
 }
 \examples{
-blupga_EFF()
+# get example genotype matrix and phenotype data
+data(M)
+data(pheno)
+
+
+# choose a validation set of 20 random individuals
+val <- sample(1:nrow(pheno), 20)
+
+# Run a GWAS to estimate squared SNP effects for all SNPs.
+# By calling \\code{\\link{est_SNPeffects}} this process will be done using the individuals NOT in your 'val' set.
+# Of course you can use your own method to generate the full vector of SNP effects,
+#  as determined in a training set of individuals.
+bsq <- est_SNPeffects(pheno, M, val)
+
+# make a standard GRM for all SNPs
+G <- make_GRM(M)
+
+# run BLUPGA where the top 1 percent of SNPs (according to effect size) are weighted
+results <- blupga_EFF(G, pheno, val, M, bsq, 0.01, flank=FALSE)
+
+# run BLUPGA where the top 0.1 percent of SNPs (according to effect size) are weighted and
+# SNPs immediately upstream and downstream of those top SNPs are also weighted.
+results <- blupga_EFF(G, pheno, val, M, bsq, 0.001, flank=TRUE)
 }
 \keyword{GBLUP,BLUP|GA,SNP}
 \keyword{selection}

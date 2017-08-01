@@ -14,11 +14,17 @@ est_SNPeffects(phenodata, genomat, valset, fixmat = NULL)
 \item{valset}{vector of indices Defaults to NULL.}
 }
 \value{
-a vector of squared SNP effects, one per SNP in \code{genomat}, estimated with the EMMAX GWAS method from the 'cpgen' package.
+a vector of squared SNP effects, one per SNP in \code{genomat}, estimated with the EMMAX GWAS method from the \pkg{cpgen} package.
 }
 \description{
 estimate the additive effect of each SNP upon a trait (i.e. quick GWAS). SNPs are provided in a genotype matrix.
 }
 \examples{
-est_SNPeffects()
+# get an example genotype matrix
+data(M)
+# get an example phenotype data frame
+data(pheno)
+# choose a validation set of 20 random individuals
+val <- sample(1:nrow(pheno), 20)
+est_SNPeffects(pheno, M, val)
 }

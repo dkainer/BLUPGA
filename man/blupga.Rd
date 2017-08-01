@@ -2,27 +2,53 @@
 % Please edit documentation in R/BLUPGA.R
 \name{blupga}
 \alias{blupga}
-\title{Standard GBLUP}
+\title{Basic BLUP|GA}
 \usage{
 blupga(G, S, phenodata, valset, verbose = T)
 }
 \arguments{
-\item{G}{GRM constructed using all available SNPs and all samples Defaults to NULL. Use \code{make_GRM()} to get this.}
+\item{G}{GRM constructed using all available SNPs and all samples Defaults to NULL. Use \code{\link{make_GRM}} to get this.}
 
-\item{S}{Weighted G-matrix constructed using only selected SNPs and all samples Defaults to NULL. Use \code{make_weighted_GRM()} to get this.}
+\item{S}{Weighted G-matrix constructed using only selected SNPs and all samples Defaults to NULL. Use \code{\link{make_weighted_GRM}} to get this.}
 
 \item{phenodata}{data frame with 2 columns. One col must be named 'ID' and contain sample IDs. Another column must be named 'y' and contain the phenotypes. Defaults to NULL.}
 
 \item{valset}{vector of indices that defines which rows in \code{phenodata} will be set to NA and used for cross-validation Defaults to NULL.}
 }
 \value{
-a data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}. Each row contains that correlation at increasing values of the weighting value W.
+A data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}.
+
+ Since BLUP|GA is run for each value of omega (W) from 0.0 to 1.0 in increments of 0.10, each row of the returned data frame
+  contains the cross-validation correlation at one value of omega (W). This allows the user to find the value of W
+  at which the predictive ability (COR) is maximised.
+
+  Columns:
+\describe{
+  \item{W}{omega weighting for selected SNPS in candidate genes (0.0--1.0)}
+  \item{COR}{cross validation predictive ability (0.0--1.0)}
+  }
 }
 \description{
 This function runs the BLUP|GA method where certain SNPs are weighted in the a special GRM (S) prior to GBLUP.
 }
 \examples{
-blupga()
+# get example genotype matrix and phenotype data
+data(M)
+data(pheno)
+
+# select some 'special' SNPs from M to be weighted
+GAsnps <- sample(1:ncol(M), 20)
+
+# generate random weights for the 'special' SNPs
+wt <- runif(length(GAsnps), min = 1, max = 10)
+# make a weighted GRM for the 'special' SNPs
+S <- make_weighted_GRM(M[,GAsnps], wt)
+# make a standard GRM for all SNPs
+G <- make_GRM(M)
+
+# choose a validation set of 20 random individuals
+val <- sample(1:nrow(pheno), 20)
+results <- blupga(G, S, pheno, val)
 }
 \keyword{GBLUP,BLUP|GA,SNP}
 \keyword{selection}

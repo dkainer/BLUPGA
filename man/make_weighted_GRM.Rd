@@ -12,13 +12,18 @@ make_weighted_GRM(genomat, weights)
 \item{weights}{vector of weights for each of the SNPs in the \code{genomat}. Use a vector of 1s to avoid weighting.}
 }
 \value{
-a weighted Genomic Relationship Matrix with cols and rows named according to the rownames in \code{genomat}. Uses the 'cpgen' package implementation of Van Radens GRM method
+a weighted Genomic Relationship Matrix with cols and rows named according to the rownames in \code{genomat}. Uses the \pkg{cpgen} package implementation of Van Radens GRM method
 }
 \description{
 This function ...
 }
 \examples{
-make_weighted_GRM()
+# get an example genotype matrix
+data(M)
+# generate weights for the SNPs
+wt <- runif(ncol(M), min = 1, max = 10)
+
+make_weighted_GRM(M, wt)
 }
 \keyword{GBLUP,BLUP|GA,SNP}
 \keyword{selection}

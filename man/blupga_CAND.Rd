@@ -17,7 +17,15 @@ blupga_CAND(G = NULL, phenodata = NULL, valset = NULL, GRMs = NULL,
 \item{GRMs}{List of G-matrices, each constructed from just the SNPs in one candidate gene/region. Defaults to NULL.}
 }
 \value{
-a data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}. Each row contains that correlation at increasing values of the weighting value W.
+A data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}.
+
+ Since BLUP|GA is run for each value of omega (W) from 0.0 to 1.0 in increments of 0.10, each row of the returned data frame
+  contains the cross-validation correlation at one value of omega (W). This allows the user to find the value of W
+  at which the predictive ability (COR) is maximised.
+\describe{
+  \item{W}{omega weighting for selected SNPS in candidate genes (0.0--1.0)}
+  \item{COR}{cross validation predictive ability (0.0--1.0)}
+  }
 }
 \description{
 This function runs the BLUP|GA method where SNPs in candidate genes are weighted in the GRM prior to GBLUP

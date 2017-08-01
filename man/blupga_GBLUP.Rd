@@ -13,11 +13,26 @@ blupga_GBLUP(G, phenodata, valset, verbose = T)
 
 \item{valset}{vector of indices that defines which rows in \code{phenodata} will be set to NA and used for cross-validation Defaults to NULL.}
 }
+\value{
+a data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the valset.
+\describe{
+  \item{W}{omega weighting for selected SNPS in candidate genes (0.0--1.0)}
+  \item{COR}{cross validation predictive ability (0.0--1.0)}
+  }
+}
 \description{
 This function runs straightforward GBLUP using the rrBLUP package. This is the equivalent of BLUP|GA where W=0 (i.e. no SNPs are weighted)
 }
 \examples{
-blupga_GBLUP()
+# get example genotype matrix and phenotype data
+data(M)
+data(pheno)
+
+G <- make_GRM(M)
+
+# choose a validation set of 20 random individuals
+val <- sample(1:nrow(pheno), 20)
+results <- blupga_GBLUP(G, pheno, val)
 }
 \keyword{GBLUP,BLUP|GA,SNP}
 \keyword{selection}
