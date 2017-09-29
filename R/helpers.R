@@ -17,10 +17,10 @@
 #' make_weighted_GRM(M, wt)
 make_weighted_GRM <- function(genomat, weights)
 {
-  G1 <- cpgen::cgrm(genomat, weights) #uses the fast, low mem cpgen implementation of Van Raden (2008).
-  colnames(G1) <- rownames(genomat)
-  rownames(G1) <- rownames(genomat)
-  return(G1)
+  G <- cpgen::cgrm(genomat, weights) #uses the fast, low mem cpgen implementation of Van Raden (2008).
+  colnames(G) <- rownames(genomat)
+  rownames(G) <- rownames(genomat)
+  return(G)
 }
 
 #' Construct the G matrix from genotypes
@@ -58,14 +58,83 @@ make_GRM <- function(genomat)
 #' # choose a validation set of 20 random individuals
 #' val <- sample(1:nrow(pheno), 20)
 #' est_SNPeffects(pheno, M, val)
-est_SNPeffects <- function(phenodata, genomat, valset, fixmat=NULL)
+est_SNPeffects <- function(phenodata, genomat, valset, fixmat=NULL, method="emmax", R2=0.5)
 {
-  cat("estimating marker effects with EMMAX\n")
+  cat("estimating marker effects using: ", method,"\n")
 
-  pheno.blup            <- phenodata
-  pheno.blup$y[valset]  <- NA
+
   selected    <- phenodata[valset,]$ID
   trainset    <- which(!phenodata$ID %in% selected )
-  eff     <- (cpgen::cGWAS.emmax(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
+
+
+  if(method=="BayesA")
+  {
+    set_num_threads(1)
+    z_list <- list(genomat[trainset,])
+    par_random <- list(list(method="BayesA",scale=var(pheno$y[trainset])/2, df=5, name="add"))
+    fit <- cpgen::clmm(y = phenodata$y[trainset], X=fixmat[trainset,], Z = z_list, par_random=par_random, niter=5000, burnin=2500)
+    eff <- fit$add$posterior$estimates_mean^2
+  }
+  else if(method=="WGR")
+  {
+    eff <- bWGR::wgr(y = phenodata$y[trainset], genomat[trainset,], iv=FALSE,de=TRUE, it=1000,bi=200, verb=TRUE)
+  }
+  else if(method=="emRR")
+  {
+    eff <- bWGR::emRR(y = phenodata$y[trainset], genomat[trainset,], R2)$b^2
+  }
+  else if(method=="emBL2")
+  {
+    eff <- bWGR::emDE(y = phenodata$y[trainset], genomat[trainset,], R2)$b^2
+  }
+  else if(method=="Ridge")
+  {
+    eff <- rrBLUP::mixed.solve(y=phenodata$y[trainset], Z=genomat[trainset,], X=fixmat[trainset,])$u^2
+    eff <- as.numeric(eff)
+  }
+  else if(method=="GWAS")
+  {
+    eff     <- (cpgen::cGWAS(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
+  }
+  else  # default is EMMAX
+    eff     <- (cpgen::cGWAS.emmax(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
+
   return(eff)
+}
+
+est_SNPpvals <- function(phenodata, genomat, valset, fixmat=NULL, method="emmax")
+{
+  cat("estimating marker effects using: ", method)
+
+  #pheno.blup            <- phenodata
+  #pheno.blup$y[valset]  <- NA
+  selected    <- phenodata[valset,]$ID
+  trainset    <- which(!phenodata$ID %in% selected )
+
+  # default is EMMAX
+  pval     <- -log10(cpgen::cGWAS.emmax(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$p_value)
+
+  return(pval)
+}
+
+simulate <- function(nind, nsnp, prop_qtl, h2, nval, seed=999, effmethod="emmax", model="EFF0.1")
+{
+  cpgen::rand_data(n=nind, p_marker = nsnp, h2=h2, prop_qtl = prop_qtl, seed = seed)
+  pheno <- data.frame(ID=seq(1,nind), y=y)
+  val <- sample(1:nrow(pheno), nval)
+  G1 <- make_GRM(M)
+  colnames(G1) <- pheno$ID
+  rownames(G1) <- pheno$ID
+
+  if(effmethod=="BayesA")
+    eff <- est_SNPeffects(pheno, M, val, method = "BayesA")
+  else
+    eff <- est_SNPpvals(pheno, M, val, method="emmax")
+  plot(eff)
+  if(model == "EFF0.1")
+    res <- blupga_EFF(G1, pheno, val, M, eff, perc=0.001, flank=TRUE)
+  else
+    res <- blupga_EFF(G1, pheno, val, M, eff, perc=0.01, flank=TRUE)
+
+  print(res)
 }

@@ -48,9 +48,8 @@ data(pheno)
 val <- sample(1:nrow(pheno), 20)
 
 # Run a GWAS to estimate squared SNP effects for all SNPs.
-# By calling \\code{\\link{est_SNPeffects}} this process will be done using the individuals NOT in your 'val' set.
-# Of course you can use your own method to generate the full vector of SNP effects,
-#  as determined in a training set of individuals.
+# By calling est_SNPeffects() this process will be done using the individuals NOT in your 'val' set.
+# Of course you can use your own method to generate the full vector of SNP effects using a training set of individuals.
 bsq <- est_SNPeffects(pheno, M, val)
 
 # make a standard GRM for all SNPs

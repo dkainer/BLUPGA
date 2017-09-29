@@ -4,17 +4,16 @@
 \alias{blupga_CAND}
 \title{BLUP|GA using SNPs in Candidate Genes}
 \usage{
-blupga_CAND(G = NULL, phenodata = NULL, valset = NULL, GRMs = NULL,
-  verbose = T)
+blupga_CAND(G, phenodata, valset, GRMs = NULL, verbose = T)
 }
 \arguments{
 \item{G}{G-matrix constructed using all available SNPs and samples Defaults to NULL.}
 
-\item{phenodata}{data frame with 2 columns. One col must be named 'ID' and contain sample IDs. Another column must be named 'y' and contain the phenotypes. Defaults to NULL.}
-
 \item{valset}{vector of indices that defines which rows in \code{phenodata} will be set to NA and used for cross-validation Defaults to NULL.}
 
 \item{GRMs}{List of G-matrices, each constructed from just the SNPs in one candidate gene/region. Defaults to NULL.}
+
+\item{@param}{phenodata data frame with 2 or 3 columns. One col must be named 'ID' and contain sample IDs. Another col must be named 'y' and contain the phenotypes. If fixed effects are included then a 3rd col called 'FE' should contain the categorical effects. Defaults to NULL.}
 }
 \value{
 A data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}.

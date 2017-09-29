@@ -4,19 +4,19 @@
 \alias{blupga}
 \title{Basic BLUP|GA}
 \usage{
-blupga(G, S, phenodata, valset, verbose = T)
+blupga(G, Smat, phenodata, valset, verbose = T)
 }
 \arguments{
 \item{G}{GRM constructed using all available SNPs and all samples Defaults to NULL. Use \code{\link{make_GRM}} to get this.}
 
+\item{phenodata}{data frame with 2 or 3 columns. One col must be named 'ID' and contain sample IDs. Another col must be named 'y' and contain the phenotypes. If fixed effects are included then a 3rd col called 'FE' should contain the categorical effects.}
+
+\item{valset}{numeric vector of indices that defines which rows in \code{phenodata} will be set to NA and used for cross-validation Defaults to NULL.}
+
 \item{S}{Weighted G-matrix constructed using only selected SNPs and all samples Defaults to NULL. Use \code{\link{make_weighted_GRM}} to get this.}
-
-\item{phenodata}{data frame with 2 columns. One col must be named 'ID' and contain sample IDs. Another column must be named 'y' and contain the phenotypes. Defaults to NULL.}
-
-\item{valset}{vector of indices that defines which rows in \code{phenodata} will be set to NA and used for cross-validation Defaults to NULL.}
 }
 \value{
-A data frame containing the correlation between the predicted phenotype and the true phenotype of the individuals in the \code{valset}.
+A data frame containing the correlation between the genetic value (GEBV) and the fixed-effects adjusted phenotype of the individuals in the \code{valset}.
 
  Since BLUP|GA is run for each value of omega (W) from 0.0 to 1.0 in increments of 0.10, each row of the returned data frame
   contains the cross-validation correlation at one value of omega (W). This allows the user to find the value of W

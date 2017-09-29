@@ -4,7 +4,7 @@
 \alias{est_SNPeffects}
 \title{estimate the additive effect of each SNP upon a trait (i.e. quick GWAS)}
 \usage{
-est_SNPeffects(phenodata, genomat, valset, fixmat = NULL)
+est_SNPeffects(phenodata, genomat, valset, fixmat = NULL, method = "emmax")
 }
 \arguments{
 \item{phenodata}{data frame with 2 columns. One col must be named 'ID' and contain sample IDs. Another column must be named 'y' and contain the phenotypes. Defaults to NULL.}

@@ -260,5 +260,5 @@ blupga_EFF <- function(G, phenodata, valset=NULL, genomat, bsq, perc, flank=TRUE
 
 
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage("BLUP|GA genomic Prediction package is now loaded")
+  packageStartupMessage("BLUP|GA genomic prediction package is now loaded")
 }
