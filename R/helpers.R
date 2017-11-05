@@ -62,22 +62,39 @@ est_SNPeffects <- function(phenodata, genomat, valset, fixmat=NULL, method="emma
 {
   cat("estimating marker effects using: ", method,"\n")
 
-
   selected    <- phenodata[valset,]$ID
   trainset    <- which(!phenodata$ID %in% selected )
-
 
   if(method=="BayesA")
   {
     set_num_threads(1)
     z_list <- list(genomat[trainset,])
-    par_random <- list(list(method="BayesA",scale=var(pheno$y[trainset])/2, df=5, name="add"))
-    fit <- cpgen::clmm(y = phenodata$y[trainset], X=fixmat[trainset,], Z = z_list, par_random=par_random, niter=5000, burnin=2500)
+    par_random <- list(list(method="BayesA",scale=var(pheno$y[trainset])/2, df=4, name="add"))
+    fit <- cpgen::clmm(y = phenodata$y[trainset], X=fixmat[trainset,], Z = z_list, par_random=par_random, niter=2000, burnin=500)
     eff <- fit$add$posterior$estimates_mean^2
   }
-  else if(method=="WGR")
+  else if(method=="BayesC")
   {
-    eff <- bWGR::wgr(y = phenodata$y[trainset], genomat[trainset,], iv=FALSE,de=TRUE, it=1000,bi=200, verb=TRUE)
+    FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
+    hyp <- VIGoR::hyperpara(Geno=genomat[trainset,], Method = method, Mvar=0.5, f=0.1, Nu=c(4,8,12), Kappa=c(0.05,0.01,0.001))
+    eff <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method="BayesC",
+                        Hyperparameters = hyp, Function = "tuning", Covariates = FE.mat[trainset,])$Beta^2
+  }
+  else if(method=="BayesB")
+  {
+    FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
+    #hyp <- VIGoR::hyperpara(Geno=genomat[trainset,], Method = method, Mvar=0.5, f=0.1, Nu=c(4,8,12), Kappa=c(0.05,0.01,0.001))
+    hyp <- c(16,0.000533,0.01)
+    eff <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method="BayesB",
+                        Hyperparameters = c(5,1,0.01), Function = "fitting", Covariates = FE.mat[trainset,])$Beta^2
+  }
+  else if(method=="BL")
+  {
+    FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
+    eff <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method=method,
+                        Hyperparameters = matrix(c(1,0.1, 1,0.01, 1,0.001), byrow = T, nrow = 2),
+                        Function = "tuning", Covariates = FE.mat[trainset,])$Beta^2
+
   }
   else if(method=="emRR")
   {
@@ -85,7 +102,7 @@ est_SNPeffects <- function(phenodata, genomat, valset, fixmat=NULL, method="emma
   }
   else if(method=="emBL2")
   {
-    eff <- bWGR::emDE(y = phenodata$y[trainset], genomat[trainset,], R2)$b^2
+    eff <- bWGR::emDE(y = phenodata$y[trainset], genomat[trainset,])$b^2
   }
   else if(method=="Ridge")
   {
@@ -96,9 +113,18 @@ est_SNPeffects <- function(phenodata, genomat, valset, fixmat=NULL, method="emma
   {
     eff     <- (cpgen::cGWAS(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
   }
+  else if(method=="LMM")
+  {
+    phenodata %<>% dplyr::rename(scanID=ID)
+    nullmod   <- fitNullMM( phenodata[trainset,], outcome="y", covars=c("Q1","Q2","Q3","Q4","Q5"), covMatList=as.matrix(G1[trainset,trainset]) )
+    assoc <- assocTestMM(GenotypeData(whole.genesis), nullmod, impute.geno = F, snp.block.size = 20000, snp.include = pruned.id)
+    eff <- -log10(assoc$Wald.pval)
+  }
   else  # default is EMMAX
+  {
+    cat("estimating marker effects using: emmax \n")
     eff     <- (cpgen::cGWAS.emmax(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
-
+  }
   return(eff)
 }
 
@@ -137,4 +163,21 @@ simulate <- function(nind, nsnp, prop_qtl, h2, nval, seed=999, effmethod="emmax"
     res <- blupga_EFF(G1, pheno, val, M, eff, perc=0.01, flank=TRUE)
 
   print(res)
+}
+
+simulate_mixture <- function(nind, nsnp, prop_qtl, h2, nval, seed=999, effmethod="emmax", model="EFF0.1")
+{
+
+  # major effect QTLs
+  cpgen::rand_data(n=nind, p_marker = 10, h2=h2, prop_qtl = 1, seed = seed)
+  M.big <- M
+
+  # small effect QTLs
+  cpgen::rand_data(n=nind, p_marker = 100, h2=h2, prop_qtl = 1, seed = seed)
+  M.small <- M
+
+  # tiny effect QTLs
+  cpgen::rand_data(n=nind, p_marker = 500, h2=h2, prop_qtl = 1, seed = seed)
+  M.tiny <- M
+
 }
