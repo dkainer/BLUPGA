@@ -29,7 +29,11 @@ w ranges from 0 to 1.
 - When w=1 the selected SNPs in the S matrix are given full weight and the background SNPs are ignored.
 
 ## Using this R package
+The basic method is `blupga_EFF()`.
+
 To run BLUP|GA you need:
-- a genotype matrix (in -1,0,1} format. Both columns and rows should be named with your sample IDs.
+- a genotype matrix (in -1,0,1} format.
 - a phenotype data frame with the first column containing your sample IDs..
-- a vector of weightings for SNPs.
+- a vector of SNP effects the same length as the number of SNPs in the genotype matrix. you can generate these with `est_SNPeffects()` or bring your own from other methods
+
+The method `blupga_EFF()` lets you specify what percent of your SNPs you want to be used in the S matrix. e.g. the top 1% of SNPs when ranked by squared effect size. 
