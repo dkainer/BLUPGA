@@ -7,6 +7,8 @@ Can be installed directly from github with:
 # install.packages("devtools")
 devtools::install_github("dkainer/BLUPGA") 
 ```
+## citing this package
+Kainer, D., Stone, E. A., Padovan, A., Foley, W. J., & Külheim, C. (2018). Accuracy of Genomic Prediction for Foliar Terpene Traits in Eucalyptus polybractea. G3: Genes, Genomes, Genetics, 8(8), 2573-2583.
 
 ## what is BLUP|GA?
 BLUP|GA means *Best Linear Unbiased Prediction given Genetic Architecture*. It is a genomic prediction model that is basically a weighted version of GBLUP. The original BLUP|GA publication can be found here:
