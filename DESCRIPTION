@@ -13,5 +13,7 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     cpgen,
-	rrBLUP (>= 4.4)
+    rrBLUP (>= 4.4),
+    dplyr,
+    bWGR
 RoxygenNote: 6.0.1.9000
