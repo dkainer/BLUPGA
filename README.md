@@ -2,10 +2,10 @@
 R implementation of BLUP|GA genomic prediction.
 
 ## installation
-Can be installed directly from github with:
+Can be installed directly from github with Bioconductor install manager. Package 'cpgen' needs to be installed first.
 ```R
-# install.packages("devtools")
-devtools::install_github("dkainer/BLUPGA") 
+BiocManager::install("cheuerde/cpgen")
+BiocManager::install("dkainer/BLUPGA") 
 ```
 ## citing this package
 Kainer, D., Stone, E. A., Padovan, A., Foley, W. J., & Külheim, C. (2018). Accuracy of Genomic Prediction for Foliar Terpene Traits in Eucalyptus polybractea. G3: Genes, Genomes, Genetics, 8(8), 2573-2583.
