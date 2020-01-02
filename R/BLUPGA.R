@@ -1,6 +1,6 @@
-devtools::use_package("cpgen")
-devtools::use_package("rrBLUP")
-devtools::use_package("dplyr")
+use_package("cpgen")
+use_package("bWGR")
+use_package("dplyr")
 
 #' Basic BLUP|GA
 #'

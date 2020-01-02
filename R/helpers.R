@@ -67,65 +67,60 @@ est_SNPeffects <- function(phenodata, genomat, valset, fixmat=NULL, method="emma
 
   if(method=="BayesA")
   {
-    set_num_threads(1)
-    z_list <- list(genomat[trainset,])
-    par_random <- list(list(method="BayesA",scale=var(pheno$y[trainset])/2, df=4, name="add"))
-    fit <- cpgen::clmm(y = phenodata$y[trainset], X=fixmat[trainset,], Z = z_list, par_random=par_random, niter=2000, burnin=500)
-    eff <- fit$add$posterior$estimates_mean^2
-  }
-  else if(method=="BayesC")
-  {
-    FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
-    hyp <- VIGoR::hyperpara(Geno=genomat[trainset,], Method = method, Mvar=0.5, f=0.1, Nu=c(4,8,12), Kappa=c(0.05,0.01,0.001))
-    eff <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method="BayesC",
-                        Hyperparameters = hyp, Function = "tuning", Covariates = FE.mat[trainset,])$Beta^2
+    b2 <- bWGR::wgr(y = phenodata$y[trainset], X = genomat[trainset,], pi=0, df=5, R2=R2, it=4000, bi=1000, iv=T, verb=T)$b^2
   }
   else if(method=="BayesB")
   {
-    FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
-    #hyp <- VIGoR::hyperpara(Geno=genomat[trainset,], Method = method, Mvar=0.5, f=0.1, Nu=c(4,8,12), Kappa=c(0.05,0.01,0.001))
-    hyp <- c(16,0.000533,0.01)
-    eff <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method="BayesB",
-                        Hyperparameters = c(5,1,0.01), Function = "fitting", Covariates = FE.mat[trainset,])$Beta^2
-  }
-  else if(method=="BL")
-  {
-    FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
-    eff <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method=method,
-                        Hyperparameters = matrix(c(1,0.1, 1,0.01, 1,0.001), byrow = T, nrow = 2),
-                        Function = "tuning", Covariates = FE.mat[trainset,])$Beta^2
-
+    b2 <- bWGR::wgr(y = phenodata$y[trainset], X = genomat[trainset,], pi=0.99, df=5, R2=R2, it=4000, bi=1000, iv=T, verb=T)$b^2
   }
   else if(method=="emRR")
   {
-    eff <- bWGR::emRR(y = phenodata$y[trainset], genomat[trainset,], R2)$b^2
+    b2 <- bWGR::emRR(y = phenodata$y[trainset], genomat[trainset,], R2)$b^2
   }
-  else if(method=="emBL2")
+  else if(method=="emBB")
   {
-    eff <- bWGR::emDE(y = phenodata$y[trainset], genomat[trainset,])$b^2
+    b2 <- bWGR::emBB(y = phenodata$y[trainset], gen = genomat[trainset,], Pi=0.99)$b^2
   }
-  else if(method=="Ridge")
+  else if(method=="emEN")
   {
-    eff <- rrBLUP::mixed.solve(y=phenodata$y[trainset], Z=genomat[trainset,], X=fixmat[trainset,])$u^2
-    eff <- as.numeric(eff)
+    b2 <- bWGR::emEN(y = phenodata$y[trainset], gen = genomat[trainset,], alpha=0.02)$b^2
   }
   else if(method=="GWAS")
   {
-    eff     <- (cpgen::cGWAS(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
-  }
-  else if(method=="LMM")
-  {
-    phenodata %<>% dplyr::rename(scanID=ID)
-    nullmod   <- fitNullMM( phenodata[trainset,], outcome="y", covars=c("Q1","Q2","Q3","Q4","Q5"), covMatList=as.matrix(G1[trainset,trainset]) )
-    assoc <- assocTestMM(GenotypeData(whole.genesis), nullmod, impute.geno = F, snp.block.size = 20000, snp.include = pruned.id)
-    eff <- -log10(assoc$Wald.pval)
+    b2     <- (cpgen::cGWAS(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
   }
   else  # default is EMMAX
   {
     cat("estimating marker effects using: emmax \n")
-    eff     <- (cpgen::cGWAS.emmax(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
+    b2     <- (cpgen::cGWAS.emmax(phenodata$y[trainset], genomat[trainset,], X=fixmat[trainset,])$beta)^2
   }
-  return(eff)
+  #plot(b2)
+  return(b2)
+  
+  ##### Legacy functions needed to re-run Kainer et al (2019)
+  # else if(method=="BayesC")
+  # {
+  #   FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
+  #   hyp <- VIGoR::hyperpara(Geno=genomat[trainset,], Method = method, Mvar=0.5, f=0.1, Nu=c(4,8,12), Kappa=c(0.05,0.01,0.001))
+  #   b2 <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method="BayesC",
+  #                      Hyperparameters = hyp, Function = "tuning", Covariates = FE.mat[trainset,])$Beta^2
+  # }
+  # else if(method=="BayesB")
+  # {
+  #   FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
+  #   #hyp <- VIGoR::hyperpara(Geno=genomat[trainset,], Method = method, Mvar=0.5, f=0.1, Nu=c(4,8,12), Kappa=c(0.05,0.01,0.001))
+  #   hyp <- c(16,0.000533,0.01)
+  #   b2 <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method="BayesB",
+  #                      Hyperparameters = c(5,1,0.01), Function = "fitting", Covariates = FE.mat[trainset,])$Beta^2
+  # }
+  # else if(method=="BL")
+  # {
+  #   FE.mat <- model.matrix(ID ~ 1 + as.factor(FE), data=phenodata)
+  #   b2 <- VIGoR::vigor(phenodata$y[trainset], genomat[trainset,], Method=method,
+  #                      Hyperparameters = matrix(c(1,0.1, 1,0.01, 1,0.001), byrow = T, nrow = 2),
+  #                      Function = "tuning", Covariates = FE.mat[trainset,])$Beta^2
+  #   
+  # }
 }
 
 est_SNPpvals <- function(phenodata, genomat, valset, fixmat=NULL, method="emmax")
@@ -143,8 +138,16 @@ est_SNPpvals <- function(phenodata, genomat, valset, fixmat=NULL, method="emmax"
   return(pval)
 }
 
-simulate <- function(nind, nsnp, prop_qtl, h2, nval, seed=999, effmethod="emmax", model="EFF0.1")
+simulate_geno_pheno <- function(nind=500, nsnp=10000, h2=0.5, prop_qtl=0.001, seed=999)
 {
+  cpgen::rand_data(n=nind, p_marker = nsnp, h2=h2, prop_qtl = prop_qtl)
+  pheno <- data.frame(ID=seq(1,nind), y=y)
+}
+
+simulate <- function(nind, nsnp, prop_qtl, h2, nval, seed=NULL, effmethod="emmax", model="EFF0.1")
+{
+  if(is.null(seed)) seed = sample(1:10000, 1)
+  
   cpgen::rand_data(n=nind, p_marker = nsnp, h2=h2, prop_qtl = prop_qtl, seed = seed)
   pheno <- data.frame(ID=seq(1,nind), y=y)
   val <- sample(1:nrow(pheno), nval)
@@ -152,14 +155,14 @@ simulate <- function(nind, nsnp, prop_qtl, h2, nval, seed=999, effmethod="emmax"
   colnames(G1) <- pheno$ID
   rownames(G1) <- pheno$ID
 
-  if(effmethod=="BayesA")
-    eff <- est_SNPeffects(pheno, M, val, method = "BayesA")
+  if(effmethod != "emmax")
+    eff <- est_SNPeffects(pheno, M, val, method = effmethod)
   else
     eff <- est_SNPpvals(pheno, M, val, method="emmax")
   plot(eff)
   if(model == "EFF0.1")
     res <- blupga_EFF(G1, pheno, val, M, eff, perc=0.001, flank=TRUE)
-  else
+  else # model = EFF1
     res <- blupga_EFF(G1, pheno, val, M, eff, perc=0.01, flank=TRUE)
 
   print(res)
